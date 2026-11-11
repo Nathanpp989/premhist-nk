@@ -1,0 +1,50 @@
+# ci-glyph-catalog.yml - a drop-in GitHub Actions job for the glyph catalog.
+#
+# Copy this into .github/workflows/ in the PremHist repo (or paste the `glyph-catalog` job into an
+# existing workflow). It needs nothing but Python: the audit imports the orchestrator package and
+# compares the generated files, it starts no services and reads no plant.
+#
+# Why it is worth a job of its own: the glyph table lives in three languages (Python owns it, Rust
+# and JS carry copies). The failure mode of a drift is not a test failure, it is a symbol the
+# viewer cannot draw, or an AttributeError in the middle of a Describe - found in QA rather than in
+# a build. 20 seconds of CI replaces that.
+
+name: glyph catalog
+
+on:
+  push:
+    paths:
+      - "**/display_glyphs.py"
+      - "**/display_pipes.py"
+      - "**/glyphs.rs"
+      - "**/display_glyphs_*.js"
+      - "**/gen_glyph_catalog.py"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  glyph-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # The orchestrator package must be importable. Adjust the path if the service moves.
+      - name: Locate the orchestrator package
+        run: |
+          DIR=$(dirname "$(find . -name calc_scope.py -path '*/orchestrator/*' | head -1)")
+          echo "PYTHONPATH=$(dirname "$DIR")" >> "$GITHUB_ENV"
+          echo "found orchestrator at $DIR"
+
+      - name: Audit the catalog, and compare the generated files
+        run: bash tools/ci-glyph-catalog.sh
+
+      # Catches the other half of the same problem: a generated file edited by hand. The audit
+      # above compares content, this proves regeneration is a no-op on a clean tree.
+      - name: Regenerating changes nothing
+        run: |
+          python -I tools/gen_glyph_catalog.py --out "$RUNNER_TEMP/gen" >/dev/null
+          git diff --exit-code || (echo "::error::regenerating the catalog changed tracked files" && exit 1)

@@ -1,0 +1,54 @@
+PremHist QA - patched files
+Generated 2026-11-11 (bundle r16).
+
+Apply:  powershell -ExecutionPolicy Bypass -File .\apply-patch.ps1 -Yes
+        ... -AlsoPackage "<the unzipped PremHist-QA-... folder>"   so Setup.cmd keeps them
+Verify: python-describe\python.exe tools\verify-fixes.py       (100 checks)
+Report: tools\describe-report.cmd         what the Describe logs say
+Check:  tools\diagnose-describe.ps1       calls POST /api/describe/selftest
+Glyphs: tools\glyphs.cmd --audit | --find | --summary | --check DIR
+Ctrl+C: tools\ctrlc-broadcast-test.ps1    settles the stop-order question
+CI:     tools\ci-glyph-catalog.cmd   (or .sh / the drop-in .yml)
+
+New in r16: stop-, switch-describe-model- and uninstall-premhist-qa.ps1 are
+patched for the first time: a part that will not stop keeps its record, a
+model switch onto a broken engine is not reported as success, and a locked
+file no longer ends an uninstall halfway with no explanation.
+
+FILE                                          SHA256[0:16]       LINES
+--------------------------------------------- ------------------ -----
+README-QA.md                                  ac4ad007d6f908c5     213
+apply-patch.ps1                               7ef51c85ce1632dc     277
+describe/describe_app.py                      159ee367562c64b9     216
+describe/orchestrator/calc_authoring.py       6151ed1b3f93b0a6    2548
+describe/orchestrator/calc_describe_log.py    79f86eb80605f82d     144
+describe/orchestrator/calc_scope.py           a1df144640a5b9d1    1000
+describe/orchestrator/describe_log_io.py      4a443d0223f0176a     189
+describe/orchestrator/display_authoring.py    8bf2e5bcb461cf15    7359
+describe/orchestrator/display_describe_log.py cb8e0ca4ab1317ff     191
+describe/orchestrator/display_glyphs.py       39f844b6a9e4288b     630
+describe/orchestrator/display_pipes.py        65441c33cc083d00     785
+describe/orchestrator/llm_runtime.py          eb89960ddd6aba4a     624
+describe/orchestrator/settings.py             10fefb40594291dd     237
+describe/routes_calcs.py                      853f58386cc52471     125
+describe/routes_common.py                     0c1bac12f1ff917f     161
+describe/routes_displays.py                   cacede043c71bf64      95
+describe/routes_selftest.py                   ef434ff048b43580     240
+qa-common.ps1                                 dc3a465e7a5d4620     444
+seed_examples.py                              79a47efbbd02fb65     250
+setup-premhist-qa.ps1                         cbd00abf65eaab41     234
+start-premhist-qa.ps1                         4ca0ee7aeee81ccb     342
+stop-premhist-qa.ps1                          7a826b28a3fbbf9f      53
+switch-describe-model.ps1                     be586b37875e9561      98
+tools/ci-glyph-catalog.cmd                    d4138c0af2698fa5      36
+tools/ci-glyph-catalog.sh                     5170a4050c4b8ec5      59
+tools/ci-glyph-catalog.yml                    1905e1dab938a159      50
+tools/ctrlc-broadcast-test.ps1                4a732aea69da9857     170
+tools/describe-report.cmd                     e43099c424ca4774      26
+tools/describe-report.py                      ac41403a101282b5     382
+tools/diagnose-describe.ps1                   81e1d5c7ec7b636d     250
+tools/gen_glyph_catalog.py                    282d184b69937d43     446
+tools/glyphs.cmd                              7c03e16bb6518ebe      25
+tools/verify-fixes.py                         4c8c5eb35c26a45b     408
+tools/why-describe-wont-start.ps1             c273efaab864ee7a     189
+uninstall-premhist-qa.ps1                     aecef08ce426cf03      83
