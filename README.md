@@ -54,3 +54,4 @@ replaces, and runs the verifier afterwards.
   120 s one round costs 162 s, so the repair loop is unreachable. A configuration decision.
 
 `VERIFY.txt` lists every file with its sha256 and line count.
+# premalytics-premhist-nk
